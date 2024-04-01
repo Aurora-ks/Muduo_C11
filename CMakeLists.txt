@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.10)
+project(MyMuduo VERSION 1.0)
+
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+set(LIB_NAME libnet)
+file(GLOB SRC_LIST *.hpp)
+file(GLOB SRC_LIST *.ipp)
+file(GLOB SRC_LIST *.h)
+add_library(${LIB_NAME} STATIC ${SRC_LIST})
+# set_target_properties(${LIB_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
