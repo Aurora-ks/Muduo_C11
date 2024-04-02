@@ -80,12 +80,12 @@ private:
     }while(0);
 
 #ifdef DEBUG_MOD
-#define LOG_DEBUGL(MsgFormat, ...) \
+#define LOG_DEBUG(MsgFormat, ...) \
     do{ \
         char buf[1024]{0}; \
         sprintf(buf, 1024, MsgFormat, ##__VA_ARGS__); \
         Logger::GetInstance()->log(DEBUGL, buf); \
     }while(0)
 #else
-    #define LOG_DEBUGL(MsgFormat, ...)
+    #define LOG_DEBUG(MsgFormat, ...)
 #endif
