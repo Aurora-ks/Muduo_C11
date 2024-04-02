@@ -91,13 +91,9 @@ public:
 
     EventLoop *loop() { return loop_; }
 
+    void remove();
 private:
-    void update()
-    {
-    }
-    void remove()
-    {
-    }
+    void update();
 
     EventLoop *loop_;
     const int fd_;
