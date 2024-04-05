@@ -2,10 +2,10 @@
 
 #include <vector>
 #include <unordered_map>
-#include "timestamp.hpp"
-#include "channel.hpp"
+#include "channel.h"
 
 class EventLoop;
+class TimeStamp;
 
 class Poller
 {

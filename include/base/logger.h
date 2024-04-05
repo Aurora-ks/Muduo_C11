@@ -4,7 +4,7 @@
 #include <iostream>
 #include "nocopyable.h"
 #include "singleton.ipp"
-#include "timestamp.hpp"
+#include "timestamp.h"
 
 enum LogLevel
 {
@@ -19,33 +19,8 @@ class Logger final : public Singleton<Logger>
 {
 public:
     void SetLevel(int level){LogLevel_ = level;}
-    void log(std::string msg)
-    {
-        switch (LogLevel_)
-        {
-        case INFO:
-            std::cout << "[info] ";
-            break;
-        case WARNING:
-            std::cout << "[warning] ";
-            break;
-        case ERROR:
-            std::cout << "[error] ";
-            break;
-        case FATAL:
-            std::cout << "[fatal] ";
-            break;
-        case DEBUG:
-            std::cout << "[debug] ";
-        }
-        std::cout << TimeStamp::now().toString() << ":";
-        std::cout << msg << std::endl;
-    }
-    void log(int level, std::string msg)
-    {
-        SetLevel(level);
-        log(msg);
-    }
+    void log(std::string msg);
+    void log(int level, std::string msg);
 private:
     int LogLevel_;
 };
