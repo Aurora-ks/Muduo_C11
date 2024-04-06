@@ -7,9 +7,6 @@ void Logger::log(std::string msg)
     case INFO:
         std::cout << "[info] ";
         break;
-    case WARNING:
-        std::cout << "[warning] ";
-        break;
     case ERROR:
         std::cout << "[error] ";
         break;

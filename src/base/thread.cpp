@@ -1,7 +1,7 @@
 #include "thread.h"
 #include <semaphore.h>
 
-std::atomic_int32_t Thread::ThreadCount_ = 0;
+std::atomic_int32_t Thread::ThreadCount_(0);
 
 Thread::Thread(TheadFun fun, const std::string &name)
     : started_(false),
@@ -26,7 +26,7 @@ void Thread::start()
     started_ = true;
     sem_t sem;
     sem_init(&sem, false, 0);
-    thread_ = std::make_shared<std::thread>(new std::thread([&](){
+    thread_ = std::shared_ptr<std::thread>(new std::thread([&](){
         ThreadId_ = std::this_thread::get_id();
         sem_post(&sem);
         fun_();
@@ -35,7 +35,7 @@ void Thread::start()
     sem_wait(&sem);
 }
 
-int Thread::join()
+void Thread::join()
 {
     joined_ = true;
     thread_->join();

@@ -9,7 +9,6 @@
 enum LogLevel
 {
     INFO,
-    WARNING,
     ERROR,
     FATAL,
     DEBUG
@@ -30,13 +29,6 @@ private:
         char buf[1024]{0}; \
         snprintf(buf, 1024, MsgFormat, ##__VA_ARGS__); \
         Logger::GetInstance()->log(INFO, buf); \
-    }while(0);
-
-#define LOG_WARNING(MsgFormat, ...) \
-    do{ \
-        char buf[1024]{0}; \
-        snprintf(buf, 1024, MsgFormat, ##__VA_ARGS__); \
-        Logger::GetInstance()->log(WARNING, buf); \
     }while(0);
 
 #define LOG_ERROR(MsgFormat, ...) \

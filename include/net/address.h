@@ -5,14 +5,17 @@
 #include <string.h>
 #include <strings.h>
 
-class Addrest
+class Address
 {
 public:
-    explicit Addrest(std::string ip, uint16_t port);
+    explicit Address() = default;
+    explicit Address(std::string ip, uint16_t port);
     uint16_t port() const { return ntohs(addr_.sin_port); }
     std::string address() const;
     std::string IpPort() const;
-    ~Addrest() = default;
+    const sockaddr_in* sockaddr() const { return &addr_; }
+    void SetSockaddr(const sockaddr_in &addr) { addr_ = addr; }
+    ~Address() = default;
 private:
     sockaddr_in addr_;
 };

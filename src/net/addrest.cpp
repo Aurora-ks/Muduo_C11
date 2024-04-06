@@ -1,6 +1,6 @@
 #include "address.h"
 
-Addrest::Addrest(std::string ip, uint16_t port)
+Address::Address(std::string ip, uint16_t port)
 {
     bzero(&addr_, sizeof(addr_));
     addr_.sin_family = AF_INET;
@@ -8,14 +8,14 @@ Addrest::Addrest(std::string ip, uint16_t port)
     addr_.sin_port = htons(port);
 }
 
-std::string Addrest::address() const
+std::string Address::address() const
 {
     char buf[64]{0};
     inet_ntop(AF_INET, &addr_.sin_addr, buf, sizeof(buf));
     return std::string(buf);
 }
 
-std::string Addrest::IpPort() const
+std::string Address::IpPort() const
 {
     char buf[64]{0};
     inet_ntop(AF_INET, &addr_.sin_addr, buf, sizeof(buf));

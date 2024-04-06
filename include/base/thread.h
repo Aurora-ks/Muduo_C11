@@ -17,7 +17,7 @@ public:
     ~Thread();
 
     void start();
-    int join();
+    void join();
 
     bool started() const { return started_; }
     std::thread::id tid() const { return ThreadId_; }
