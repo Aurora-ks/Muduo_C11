@@ -22,7 +22,8 @@ EventLoop::EventLoop()
     LOG_DEBUG("eventloop %p created in thread %d\n", this, std::this_thread::get_id())
     if (LoopInThread)
     {
-        LOG_FATAL("other loop %p already exists in thread %d", LoopInThread, std::this_thread::get_id())
+        auto id = std::this_thread::get_id();
+        LOG_FATAL("other loop %p already exists in thread %lu", LoopInThread, *(unsigned long*)&id)
     }
     else
     {
@@ -55,7 +56,8 @@ void EventLoop::start()
         }
         DoCallback();
     }
-    LOG_INFO("EventLoop %p in thread %d stoped\n", this, std::this_thread::get_id())
+    auto id = std::this_thread::get_id();
+    LOG_INFO("EventLoop %p in thread %lu stoped\n", this, *(unsigned long*)&id)
     isLooping_ = false;
 }
 
@@ -99,7 +101,7 @@ void EventLoop::wakeup()
     ssize_t n = ::write(wakeupFd_, &one, sizeof(one));
     if (n != sizeof(one))
     {
-        LOG_ERROR("EventLoop::HandleRead() reads %d bytes instead of 8", n)
+        LOG_ERROR("EventLoop::HandleRead() reads %ld bytes instead of 8", n)
     }
 }
 
@@ -113,7 +115,7 @@ void EventLoop::RemoveChannel(Channel *channel)
 }
 bool EventLoop::HasChannel(Channel *channel)
 {
-    poller_->hasChannel(channel);
+    return poller_->hasChannel(channel);
 }
 
 void EventLoop::HandleRead()
@@ -122,7 +124,7 @@ void EventLoop::HandleRead()
     ssize_t n = read(wakeupFd_, &one, sizeof(one));
     if (n != sizeof(one))
     {
-        LOG_ERROR("EventLoop::HandleRead() reads %d bytes instead of 8", n)
+        LOG_ERROR("EventLoop::HandleRead() reads %ld bytes instead of 8", n)
     }
 }
 // 执行回调
