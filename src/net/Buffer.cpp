@@ -1,6 +1,7 @@
 #include "Buffer.h"
 #include <errno.h>
 #include <sys/uio.h>
+#include <unistd.h>
 
 void Buffer::retrieve(size_t len)
 {
@@ -70,6 +71,16 @@ ssize_t Buffer::ReadFromFd(int fd, int *err)
     {
         WriterIndex_ = buffer_.size();
         append(extrabuf, n - writeable);
+    }
+    return n;
+}
+
+ssize_t Buffer::WriteFromFd(int fd, int* err)
+{
+    ssize_t n = ::write(fd, peek(), ReadableBytes());
+    if(n < 0)
+    {
+        *err = errno;
     }
     return n;
 }

@@ -40,6 +40,7 @@ public:
     //写入数据
     void append(const char* data, size_t len);
     ssize_t ReadFromFd(int fd, int* err);
+    ssize_t WriteFromFd(int fd, int* err);
 private:
     char* begin() { return &*buffer_.begin(); }
     const char* begin() const { return &*buffer_.begin(); }

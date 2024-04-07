@@ -19,7 +19,7 @@ public:
     void SetReadCallback(ReadEventCallback f) { ReadCallback_ = std::move(f); }
     void SetWriteCallback(EventCallback f) { WriteCallback_ = std::move(f); }
     void SetCloseCallback(EventCallback f) { CloseCallback_ = std::move(f); }
-    void setErrorCallback(EventCallback f) { ErrorCallback_ = std::move(f); }
+    void SetErrorCallback(EventCallback f) { ErrorCallback_ = std::move(f); }
     void HandleEvent(TimeStamp time);
 
     int events() const { return events_; }
@@ -35,8 +35,8 @@ public:
     void DisableWriting();
     void DisableAll();
 
-    bool isWriting() const { return events_ & (POLLIN | POLLPRI); }
-    bool isReading() const { return events_ & POLLOUT; }
+    bool isWriting() const { return events_ & POLLOUT; }
+    bool isReading() const { return events_ & (POLLIN | POLLPRI); }
     bool isNoneEvent() const { return events_ == 0; }
 
     EventLoop *loop() { return loop_; }
