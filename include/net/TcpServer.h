@@ -32,8 +32,8 @@ private:
     using ConnectionMap = std::unordered_map<std::string, TcpConnectionPtr>;
 
     void NewConnection(int sockfd, const Address &PeerAddrest);
-    void RemoveConnection(TcpConnectionPtr &connection);
-    void RemoveConnectionInLoop(TcpConnectionPtr &connection);
+    void RemoveConnection(const TcpConnectionPtr &connection);
+    void RemoveConnectionInLoop(const TcpConnectionPtr &connection);
 
     EventLoop* loop_;
     const std::string IpPort_;
@@ -47,7 +47,7 @@ private:
 
     ThreadInitCallback ThreadInitCallback_; // 线程初始化回调
 
-    std::atomic_int started_;
+    // std::atomic_int started_;
     int NextConnectionId_;
     ConnectionMap connections_; // 保存所有连接
 };

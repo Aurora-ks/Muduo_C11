@@ -1,13 +1,36 @@
 #include "Channel.h"
 #include "EventLoop.h"
 
-Channel::Channel(EventLoop *loop, int fd) : loop_(loop),
-                                            fd_(fd),
-                                            events_(0),
-                                            revents_(0),
-                                            state_(0) {}
+Channel::Channel(EventLoop *loop, int fd)
+    : loop_(loop),
+      fd_(fd),
+      events_(0),
+      revents_(0),
+      state_(0) {}
 
-void Channel::HandleEvent(TimeStamp time)
+void Channel::tie(const std::shared_ptr<void> &obj)
+{
+    tie_ = obj;
+    tied_ = true;
+}
+
+void Channel::HandleEvent(TimeStamp ReceiveTime)
+{
+    if (tied_)
+    {
+        std::shared_ptr<void> guard = tie_.lock();
+        if (guard)
+        {
+            HandleEventWithGuard(ReceiveTime);
+        }
+    }
+    else
+    {
+        HandleEventWithGuard(ReceiveTime);
+    }
+}
+
+void Channel::HandleEventWithGuard(TimeStamp ReceiveTime)
 {
     if (revents_ & POLLHUP && !(revents_ & POLLIN))
     {
@@ -22,7 +45,7 @@ void Channel::HandleEvent(TimeStamp time)
     if (revents_ & (POLLIN | POLLPRI))
     {
         if (ReadCallback_)
-            ReadCallback_(time);
+            ReadCallback_(ReceiveTime);
     }
     if (revents_ & POLLOUT)
     {

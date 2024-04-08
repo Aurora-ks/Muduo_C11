@@ -28,26 +28,25 @@ public:
     bool connected() const {return state_ == kConnected; }
     bool disconnected() const { return state_ == kDisconnected; }
 
-    void send(const void *message, int len);
+    void send(const std::string &data);
     void shutdown();
 
-    void SetConnectionCallback(ConnectionCallback &callback) { ConnectionCallback_ = std::move(callback); }
-    void SetMessageCallback(MessageCallback &callback) { MessageCallback_ = std::move(callback); }
-    void SetWriteCompleteCallback(WriteCompleteCallback &callback) { WriteCompleteCallback_ = std::move(callback); }
-    void SetCloseCallback(CloseCallback &callback) { CloseCallback_ = std::move(callback); }
-    void SetHighWaterMarkCallback(HighWaterMarkCallback &callback) { HighWaterMarkCallback_ = std::move(callback); }
+    void SetConnectionCallback(const ConnectionCallback &callback) { ConnectionCallback_ = std::move(callback); }
+    void SetMessageCallback(const MessageCallback &callback) { MessageCallback_ = std::move(callback); }
+    void SetWriteCompleteCallback(const WriteCompleteCallback &callback) { WriteCompleteCallback_ = std::move(callback); }
+    void SetCloseCallback(const CloseCallback &callback) { CloseCallback_ = std::move(callback); }
+    void SetHighWaterMarkCallback(const HighWaterMarkCallback &callback) { HighWaterMarkCallback_ = std::move(callback); }
 
     void ConnectEstablished();
     void ConnectDestoryed();
-
+private:
     void HeadleRead(TimeStamp ReceiveTime);
     void HandleWrite();
     void HandleClose();
     void HandleError();
 
-    void SendInLoop(const void *message, size_t len);
+    void SendInLoop(const void *data, size_t len);
     void ShutdownInLoop();
-private:
 
     EventLoop *loop_;
     const std::string name_;

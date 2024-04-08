@@ -15,6 +15,7 @@ public:
     Acceptor(EventLoop *loop, const Address &ListenAddress, bool reuseport);
     ~Acceptor();
 
+    const Socket& socket() const { return sock_; }
     void SetNewConnectionCallback(const NewConnectionCallback &callback) { NewConnectionCallback_ = std::move(callback); }
     bool listenning() const { return listenning_; }
     void listen();

@@ -10,6 +10,7 @@ class Address
 public:
     explicit Address() = default;
     explicit Address(std::string ip, uint16_t port);
+    explicit Address(const sockaddr_in &addr): addr_(addr){}
     uint16_t port() const { return ntohs(addr_.sin_port); }
     std::string address() const;
     std::string IpPort() const;

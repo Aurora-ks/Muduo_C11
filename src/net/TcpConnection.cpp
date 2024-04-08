@@ -37,17 +37,113 @@ TcpConnection::~TcpConnection()
     LOG_DEBUG("TcpConnection::destruct[%s]-fd=%d-state=%d\n", name_.c_str(), channel_->fd(), state_.load())
 }
 
-void TcpConnection::send(const void *message, int len)
+void TcpConnection::send(const std::string &data)
 {
+    if(state_ == kConnected)
+    {
+        if(loop_->IsInLoopThread())
+        {
+            SendInLoop(data.c_str(), data.size());
+        }
+        else
+        {
+            loop_->QueueInLoop(std::bind(&TcpConnection::SendInLoop, this, data.c_str(), data.size()));
+        }
+    }
 }
+
+void TcpConnection::SendInLoop(const void *data, size_t len)
+{
+    ssize_t nwrite = 0;
+    size_t remain = 0;
+    bool err = false;
+    //调用过shutdown，不能发送
+    if(state_ == kDisconnected)
+    {
+        LOG_ERROR("%d is disconnected, can not send\n", socket_->fd())
+    }
+    //channel第一次发数据，并且缓冲区没有可发送的数据
+    if(!channel_->isWriting() && OutputBuffer_.ReadableBytes() == 0)
+    {
+        nwrite = ::write(channel_->fd(), data, len);
+        if(nwrite >= 0)
+        {
+            remain = len - nwrite;
+            if(remain == 0 && WriteCompleteCallback_)
+            {
+                loop_->QueueInLoop(std::bind(WriteCompleteCallback_, shared_from_this()));
+            }
+        }
+        else
+        {
+            nwrite = 0;
+            if(errno != EAGAIN)
+            {
+                LOG_ERROR("TcpConnection::SendInLoop")
+                if(errno == EPIPE || errno == ECONNRESET)
+                {
+                    err = true;
+                }
+            }
+        }
+    }
+    if(!err && remain > 0)
+    {
+        //缓冲区剩余数据
+        size_t bufremain = OutputBuffer_.ReadableBytes();
+        if(bufremain + remain >= HighWaterMark_ && bufremain < HighWaterMark_ && HighWaterMarkCallback_)
+        {
+            loop_->QueueInLoop(std::bind(HighWaterMarkCallback_, shared_from_this(), bufremain+remain));
+        }
+        OutputBuffer_.append((char*)data + nwrite, remain);
+        if(!channel_->isWriting())
+        {
+            channel_->EnableWriting();
+        }
+    }
+}
+
 void TcpConnection::shutdown()
 {
+    if(state_ == kConnected)
+    {
+        state_ = kDisconnecting;
+        loop_->RunInLoop(std::bind(&TcpConnection::ShutdownInLoop, this));
+    }
 }
+
+void TcpConnection::ShutdownInLoop()
+{
+    // 没有数据需要发送
+    if(!channel_->isWriting())
+    {
+        socket_->ShutdownWrite();
+    }
+}
+
 void TcpConnection::ConnectEstablished()
 {
+    state_ = kConnected;
+    channel_->tie(shared_from_this());
+    channel_->EnableReading();
+    if(ConnectionCallback_)
+    {
+        ConnectionCallback_(shared_from_this());
+    }
 }
+
 void TcpConnection::ConnectDestoryed()
 {
+    if(state_ == kConnected)
+    {
+        state_ = kDisconnected;
+        channel_->DisableAll();
+        if(ConnectionCallback_)
+        {
+            ConnectionCallback_(shared_from_this());
+        }
+    }
+    channel_->remove();
 }
 
 void TcpConnection::HeadleRead(TimeStamp ReceiveTime)
@@ -133,11 +229,4 @@ void TcpConnection::HandleError()
         err = opt;
     }
     LOG_ERROR("TcpConnection::HandleError name:%s SO_ERROR:%d\n", name_.c_str(), err)
-}
-
-void TcpConnection::SendInLoop(const void *message, size_t len)
-{
-}
-void TcpConnection::ShutdownInLoop()
-{
 }

@@ -2,11 +2,12 @@
 
 #include <functional>
 #include <poll.h>
+#include <memory>
 #include "nocopyable.h"
 
 class EventLoop;
 class TimeStamp;
-
+class TcpConnection;
 class Channel : nocopyable
 {
 public:
@@ -16,11 +17,14 @@ public:
     Channel(EventLoop *loop, int fd);
     ~Channel() = default;
 
-    void SetReadCallback(ReadEventCallback f) { ReadCallback_ = std::move(f); }
-    void SetWriteCallback(EventCallback f) { WriteCallback_ = std::move(f); }
-    void SetCloseCallback(EventCallback f) { CloseCallback_ = std::move(f); }
-    void SetErrorCallback(EventCallback f) { ErrorCallback_ = std::move(f); }
+    void SetReadCallback(const ReadEventCallback &f) { ReadCallback_ = std::move(f); }
+    void SetWriteCallback(const EventCallback &f) { WriteCallback_ = std::move(f); }
+    void SetCloseCallback(const EventCallback &f) { CloseCallback_ = std::move(f); }
+    void SetErrorCallback(const EventCallback &f) { ErrorCallback_ = std::move(f); }
     void HandleEvent(TimeStamp time);
+
+    // 防止channel被手动remove掉，channel还在执行回调操作
+    void tie(const std::shared_ptr<void> &);
 
     int events() const { return events_; }
     int fd() const { return fd_; }
@@ -44,12 +48,17 @@ public:
     void remove();
 private:
     void update();
+    void HandleEventWithGuard(TimeStamp ReceiveTime);
 
     EventLoop *loop_;
     const int fd_;
     int events_;
     int revents_;
     int state_;
+
+    std::weak_ptr<void> tie_;
+    bool tied_;
+
     ReadEventCallback ReadCallback_;
     EventCallback WriteCallback_;
     EventCallback CloseCallback_;
