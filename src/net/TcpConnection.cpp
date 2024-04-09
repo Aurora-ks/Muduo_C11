@@ -15,8 +15,8 @@ TcpConnection::TcpConnection(EventLoop *loop, const std::string name, int sockfd
       name_(name),
       state_(kConnecting),
       reading_(true),
-      socket_(std::unique_ptr<Socket>(new Socket(sockfd))),
-      channel_(std::unique_ptr<Channel>(new Channel(loop, sockfd))),
+      socket_(new Socket(sockfd)),
+      channel_(new Channel(loop, sockfd)),
       LocalAddress_(local),
       RemoteAddress_(remote),
       HighWaterMark_(64 * 1024 * 1024) // 64M
