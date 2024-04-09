@@ -8,7 +8,7 @@ TcpServer::TcpServer(EventLoop *loop, const Address &ListenAddr, const std::stri
     : loop_(loop),
       IpPort_(ListenAddr.IpPort()),
       name_(name),
-      acceptor_(new Acceptor(loop, ListenAddr, ReusePort)),
+      acceptor_(std::unique_ptr<Acceptor>(new Acceptor(loop, ListenAddr, ReusePort))),
       ThreadPool_(std::make_shared<EventLoopThreadPool>(loop, name)),
       ConnectionCallback_(),
       MessageCallback_(),
@@ -23,7 +23,7 @@ TcpServer::TcpServer(EventLoop *loop, const Address &ListenAddr, const std::stri
 
 TcpServer::~TcpServer()
 {
-    for(auto &con : connections_)
+    for (auto &con : connections_)
     {
         TcpConnectionPtr conn(con.second);
         con.second.reset();
@@ -39,8 +39,7 @@ void TcpServer::SetThreadNum(int num)
 void TcpServer::start()
 {
     static std::once_flag once;
-    std::call_once(once, [&]
-                   {
+    std::call_once(once, [&]{
         ThreadPool_->start(ThreadInitCallback_);
         loop_->RunInLoop(std::bind(&Acceptor::listen, acceptor_.get())); });
 }
@@ -60,7 +59,7 @@ void TcpServer::NewConnection(int sockfd, const Address &PeerAddrest)
     sockaddr_in local;
     bzero(&local, sizeof(local));
     socklen_t len = sizeof(local);
-    if(::getsockname(acceptor_->socket().fd(), (sockaddr*)&local, &len) < 0)
+    if (::getsockname(acceptor_->socket().fd(), (sockaddr *)&local, &len) < 0)
     {
         LOG_ERROR("TcpServer::NewConnection::getsockname")
     }
@@ -87,6 +86,6 @@ void TcpServer::RemoveConnectionInLoop(const TcpConnectionPtr &connection)
              name_.c_str(), connection->name().c_str());
 
     connections_.erase(connection->name());
-    EventLoop *loop =connection->loop();
+    EventLoop *loop = connection->loop();
     loop->QueueInLoop(std::bind(&TcpConnection::ConnectDestoryed, connection));
 }
