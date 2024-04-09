@@ -4,21 +4,27 @@
 
 thread_local EventLoop* LoopInThread = nullptr;
 
+// 创建wakeupfd，用来唤醒sub处理新的channel
+int CreateEventfd()
+{
+    int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+    if (evtfd < 0)
+    {
+        LOG_FATAL("eventfd error:%d \n", errno);
+    }
+    return evtfd;
+}
+
 EventLoop::EventLoop()
     : isLooping_(false),
       quit_(false),
       callable_(false),
       threadID_(std::this_thread::get_id()),
       poller_(std::unique_ptr<EPollPoller>(new EPollPoller(this))),
+      wakeupFd_(CreateEventfd()),
       WakeupChannel_(std::unique_ptr<Channel>(new Channel(this, wakeupFd_))),
       CurrentActiveChannel_(nullptr)
 {
-    // 创建wakeupfd，用来唤醒sub处理新的channel
-    wakeupFd_ = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
-    if (wakeupFd_ < 0)
-    {
-        LOG_FATAL("eventfd creat error:%d\n", errno)
-    }
     LOG_DEBUG("eventloop %p created in thread %d\n", this, std::this_thread::get_id())
     if (LoopInThread)
     {

@@ -47,7 +47,7 @@ void TcpConnection::send(const std::string &data)
         }
         else
         {
-            loop_->QueueInLoop(std::bind(&TcpConnection::SendInLoop, this, data.c_str(), data.size()));
+            loop_->RunInLoop(std::bind(&TcpConnection::SendInLoop, this, data.c_str(), data.size()));
         }
     }
 }
@@ -55,7 +55,7 @@ void TcpConnection::send(const std::string &data)
 void TcpConnection::SendInLoop(const void *data, size_t len)
 {
     ssize_t nwrite = 0;
-    size_t remain = 0;
+    size_t remain = len;
     bool err = false;
     //调用过shutdown，不能发送
     if(state_ == kDisconnected)
@@ -180,7 +180,7 @@ void TcpConnection::HandleWrite()
                 channel_->DisableWriting();
                 if(WriteCompleteCallback_)
                 {
-                    loop_->RunInLoop(std::bind(WriteCompleteCallback_, shared_from_this()));
+                    loop_->QueueInLoop(std::bind(WriteCompleteCallback_, shared_from_this()));
                 }
                 if(state_ == kDisconnecting)
                 {

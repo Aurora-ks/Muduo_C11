@@ -8,7 +8,7 @@ TcpServer::TcpServer(EventLoop *loop, const Address &ListenAddr, const std::stri
     : loop_(loop),
       IpPort_(ListenAddr.IpPort()),
       name_(name),
-      acceptor_(std::unique_ptr<Acceptor>(new Acceptor(loop, ListenAddr, ReusePort))),
+      acceptor_(new Acceptor(loop, ListenAddr, ReusePort)),
       ThreadPool_(std::make_shared<EventLoopThreadPool>(loop, name)),
       ConnectionCallback_(),
       MessageCallback_(),
