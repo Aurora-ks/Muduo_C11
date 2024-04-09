@@ -38,10 +38,11 @@ void TcpServer::SetThreadNum(int num)
 
 void TcpServer::start()
 {
-    static std::once_flag once;
-    std::call_once(once, [&]{
+    if(started_++ == 0)
+    {
         ThreadPool_->start(ThreadInitCallback_);
-        loop_->RunInLoop(std::bind(&Acceptor::listen, acceptor_.get())); });
+        loop_->RunInLoop(std::bind(&Acceptor::listen, acceptor_.get()));
+    }
 }
 
 void TcpServer::NewConnection(int sockfd, const Address &PeerAddrest)

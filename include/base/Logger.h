@@ -4,8 +4,8 @@
 #include <iostream>
 #include "nocopyable.h"
 #include "singleton.ipp"
-#include "TimeStamp.h"
-
+#include "Timestamp.h"
+#define DEBUG_MOD
 enum LogLevel
 {
     INFO,
@@ -50,9 +50,9 @@ private:
 #define LOG_DEBUG(MsgFormat, ...) \
     do{ \
         char buf[1024]{0}; \
-        sprintf(buf, 1024, MsgFormat, ##__VA_ARGS__); \
-        Logger::GetInstance()->log(DEBUGL, buf); \
-    }while(0)
+        snprintf(buf, 1024, MsgFormat, ##__VA_ARGS__); \
+        Logger::GetInstance()->log(DEBUG, buf); \
+    }while(0);
 #else
     #define LOG_DEBUG(MsgFormat, ...)
 #endif

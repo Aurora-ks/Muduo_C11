@@ -1,6 +1,6 @@
-#include "TimeStamp.h"
+#include "Timestamp.h"
 
-std::string TimeStamp::toString() const
+std::string Timestamp::toString() const
 {
     char buf[64]{0};
     auto time = localtime(&microSecondsSinceEpoch_);

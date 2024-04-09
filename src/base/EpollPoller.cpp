@@ -11,9 +11,9 @@ EPollPoller::EPollPoller(EventLoop *loop) : Poller(loop),
     }
 }
 
-TimeStamp EPollPoller::poll(int timeoutMs, ChannelList *ActivateChannels)
+Timestamp EPollPoller::poll(int timeoutMs, ChannelList *ActivateChannels)
 {
-    int num = ::epoll_wait(epollfd_, &*events_.begin(), events_.size(), timeoutMs);
+    int num = ::epoll_wait(epollfd_, &*events_.begin(), (int)events_.size(), timeoutMs);
     int errnum = errno;
     if (num > 0)
     {
@@ -27,7 +27,7 @@ TimeStamp EPollPoller::poll(int timeoutMs, ChannelList *ActivateChannels)
     {
         LOG_DEBUG("%s timeout\n", __FUNCTION__)
     }
-    return TimeStamp::now();
+    return Timestamp::now();
 }
 
 void EPollPoller::UpdateChannel(Channel *channel)

@@ -14,7 +14,7 @@ void Channel::tie(const std::shared_ptr<void> &obj)
     tied_ = true;
 }
 
-void Channel::HandleEvent(TimeStamp ReceiveTime)
+void Channel::HandleEvent(Timestamp ReceiveTime)
 {
     if (tied_)
     {
@@ -30,7 +30,7 @@ void Channel::HandleEvent(TimeStamp ReceiveTime)
     }
 }
 
-void Channel::HandleEventWithGuard(TimeStamp ReceiveTime)
+void Channel::HandleEventWithGuard(Timestamp ReceiveTime)
 {
     if (revents_ & POLLHUP && !(revents_ & POLLIN))
     {

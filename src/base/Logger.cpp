@@ -16,7 +16,7 @@ void Logger::log(std::string msg)
     case DEBUG:
         std::cout << "[debug] ";
     }
-    std::cout << TimeStamp::now().toString() << ":";
+    std::cout << Timestamp::now().toString() << ":";
     std::cout << msg << std::endl;
 }
 

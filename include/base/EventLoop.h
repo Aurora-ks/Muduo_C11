@@ -9,7 +9,7 @@
 #include <sys/eventfd.h>
 #include <errno.h>
 #include "nocopyable.h"
-#include "TimeStamp.h"
+#include "Timestamp.h"
 
 class Channel;
 class Poller;
@@ -32,7 +32,7 @@ public:
     // 退出事件循环
     void quit();
 
-    TimeStamp PollreturnTime() { return PollreturnTime_; }
+    Timestamp PollreturnTime() { return PollreturnTime_; }
     // 在当前loop中执行
     void RunInLoop(functor callback);
     // 放入队列，唤醒当前loop线程执行
@@ -56,7 +56,7 @@ private:
     std::atomic_bool quit_;
     std::atomic_bool callable_; // 标识当前loop是否有需要执行的回调
     const std::thread::id threadID_;
-    TimeStamp PollreturnTime_;
+    Timestamp PollreturnTime_;
     std::unique_ptr<EPollPoller> poller_;
     int wakeupFd_; // 选择轮询选择一个subloop，通过此成员唤醒
     std::unique_ptr<Channel> WakeupChannel_;

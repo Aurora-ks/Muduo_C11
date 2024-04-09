@@ -5,7 +5,7 @@
 #include "Channel.h"
 
 class EventLoop;
-class TimeStamp;
+class Timestamp;
 
 class Poller
 {
@@ -15,7 +15,7 @@ public:
     Poller(EventLoop* loop): loop_(loop){}
     virtual ~Poller() = default;
 
-    virtual TimeStamp poll(int timeoutMs, ChannelList* ActivateChannels) = 0;
+    virtual Timestamp poll(int timeoutMs, ChannelList* ActivateChannels) = 0;
     virtual void UpdateChannel(Channel* channel) = 0;
     virtual void RemoveChannel(Channel* channel) = 0;
 

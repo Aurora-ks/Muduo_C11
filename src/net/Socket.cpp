@@ -30,9 +30,9 @@ void Socket::listen()
 int Socket::accept(Address *peeraddr)
 {
     sockaddr_in addr;
-    socklen_t len;
+    socklen_t len = sizeof(addr);
     bzero(&addr, sizeof(addr));
-    int cfd = ::accept(sockfd_, (sockaddr *)&addr, &len);
+    int cfd = ::accept4(sockfd_, (sockaddr *)&addr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
     if (cfd >= 0)
     {
         peeraddr->SetSockaddr(addr);

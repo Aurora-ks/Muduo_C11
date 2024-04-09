@@ -6,12 +6,12 @@
 #include "../base/nocopyable.h"
 
 class EventLoop;
-class TimeStamp;
+class Timestamp;
 class TcpConnection;
 class Channel : nocopyable
 {
 public:
-    using ReadEventCallback = std::function<void(TimeStamp)>;
+    using ReadEventCallback = std::function<void(Timestamp)>;
     using EventCallback = std::function<void()>;
 
     Channel(EventLoop *loop, int fd);
@@ -21,7 +21,7 @@ public:
     void SetWriteCallback(const EventCallback &f) { WriteCallback_ = std::move(f); }
     void SetCloseCallback(const EventCallback &f) { CloseCallback_ = std::move(f); }
     void SetErrorCallback(const EventCallback &f) { ErrorCallback_ = std::move(f); }
-    void HandleEvent(TimeStamp time);
+    void HandleEvent(Timestamp time);
 
     // 防止channel被手动remove掉，channel还在执行回调操作
     void tie(const std::shared_ptr<void> &);
@@ -48,7 +48,7 @@ public:
     void remove();
 private:
     void update();
-    void HandleEventWithGuard(TimeStamp ReceiveTime);
+    void HandleEventWithGuard(Timestamp ReceiveTime);
 
     EventLoop *loop_;
     const int fd_;

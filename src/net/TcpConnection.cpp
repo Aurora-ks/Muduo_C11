@@ -146,7 +146,7 @@ void TcpConnection::ConnectDestoryed()
     channel_->remove();
 }
 
-void TcpConnection::HeadleRead(TimeStamp ReceiveTime)
+void TcpConnection::HeadleRead(Timestamp ReceiveTime)
 {
     int err = 0;
     ssize_t n = InputBuffer_.ReadFromFd(socket_->fd(), &err);

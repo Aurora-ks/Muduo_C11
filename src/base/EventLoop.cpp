@@ -9,8 +9,8 @@ EventLoop::EventLoop()
       quit_(false),
       callable_(false),
       threadID_(std::this_thread::get_id()),
-      poller_(new EPollPoller(this)),
-      WakeupChannel_(new Channel(this, wakeupFd_)),
+      poller_(std::unique_ptr<EPollPoller>(new EPollPoller(this))),
+      WakeupChannel_(std::unique_ptr<Channel>(new Channel(this, wakeupFd_))),
       CurrentActiveChannel_(nullptr)
 {
     // 创建wakeupfd，用来唤醒sub处理新的channel

@@ -2,6 +2,10 @@
 
 set -e
 
+if [ -d lib ]; then
+    rm -r lib
+fi
+
 cmake -B build &&
     cmake --build build
 

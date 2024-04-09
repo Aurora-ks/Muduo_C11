@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../base/nocopyable.h"
-#include "../base/TimeStamp.h"
+#include "../base/Timestamp.h"
 #include "Address.h"
 #include "Callbacks.h"
 #include "Buffer.h"
@@ -40,7 +40,7 @@ public:
     void ConnectEstablished();
     void ConnectDestoryed();
 private:
-    void HeadleRead(TimeStamp ReceiveTime);
+    void HeadleRead(Timestamp ReceiveTime);
     void HandleWrite();
     void HandleClose();
     void HandleError();

@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <error.h>
 #include "Poller.h"
-#include "../base/TimeStamp.h"
+#include "../base/Timestamp.h"
 
 class EventLoop;
 class Channel;
@@ -26,7 +26,7 @@ public:
     EPollPoller(EventLoop *loop);
     ~EPollPoller() override { ::close(epollfd_); }
 
-    TimeStamp poll(int timeoutMs, ChannelList *ActivateChannels) override;
+    Timestamp poll(int timeoutMs, ChannelList *ActivateChannels) override;
     void UpdateChannel(Channel *channel) override;
     void RemoveChannel(Channel *channel) override;
 
