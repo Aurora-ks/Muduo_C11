@@ -1,9 +1,10 @@
 #include "EpollPoller.h"
 #include "Logger.h"
 
-EPollPoller::EPollPoller(EventLoop *loop) : Poller(loop),
-                                            epollfd_(::epoll_create1(EPOLL_CLOEXEC)),
-                                            events_(InitEventListSize)
+EPollPoller::EPollPoller(EventLoop *loop)
+    : Poller(loop),
+      epollfd_(::epoll_create1(EPOLL_CLOEXEC)),
+      events_(InitEventListSize)
 {
     if (epollfd_ < 0)
     {
@@ -70,7 +71,7 @@ void EPollPoller::RemoveChannel(Channel *channel)
     channel->SetState(NEW);
 }
 
-void EPollPoller::FillActiveChannels(int num, ChannelList *ActiveChannels)
+void EPollPoller::FillActiveChannels(int num, ChannelList *ActiveChannels) const
 {
     for (int i = 0; i < num; i++)
     {
@@ -84,10 +85,12 @@ void EPollPoller::update(int operation, Channel *channel)
 {
     epoll_event event;
     ::bzero(&event, sizeof(event));
+
     int fd = channel->fd();
+
     event.events = channel->events();
-    event.data.ptr = channel;
     event.data.fd = fd;
+    event.data.ptr = channel;
 
     if (::epoll_ctl(epollfd_, operation, fd, &event) < 0)
     {
