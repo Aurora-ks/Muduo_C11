@@ -31,7 +31,7 @@ public:
     void RemoveChannel(Channel *channel) override;
 
 private:
-    void FillActiveChannels(int num, ChannelList *ActiveChannels);
+    void FillActiveChannels(int num, ChannelList *ActiveChannels) const;
     void update(int operation, Channel *channel);
 
     static const int InitEventListSize = 16;
