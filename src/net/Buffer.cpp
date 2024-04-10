@@ -55,8 +55,8 @@ ssize_t Buffer::ReadFromFd(int fd, int *err)
     const size_t writeable = WriteableBytes();
     vec[0].iov_base = begin() + WriterIndex_;
     vec[0].iov_len = writeable;
-    vec[0].iov_base = extrabuf;
-    vec[0].iov_len = sizeof(extrabuf);
+    vec[1].iov_base = extrabuf;
+    vec[1].iov_len = sizeof(extrabuf);
     const int iovcnt = (writeable < sizeof(extrabuf) ? 2 : 1);
     const ssize_t n = ::readv(fd, vec, iovcnt);
     if(n < 0)

@@ -6,7 +6,8 @@ Channel::Channel(EventLoop *loop, int fd)
       fd_(fd),
       events_(0),
       revents_(0),
-      state_(0) {}
+      state_(0),
+      tied_(false) {}
 
 void Channel::tie(const std::shared_ptr<void> &obj)
 {

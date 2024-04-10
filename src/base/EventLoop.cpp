@@ -5,7 +5,7 @@
 thread_local EventLoop* LoopInThread = nullptr;
 
 // 创建wakeupfd，用来唤醒sub处理新的channel
-int CreateEventfd()
+static int CreateEventfd()
 {
     int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
     if (evtfd < 0)

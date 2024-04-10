@@ -34,6 +34,7 @@ Timestamp EPollPoller::poll(int timeoutMs, ChannelList *ActivateChannels)
 void EPollPoller::UpdateChannel(Channel *channel)
 {
     const int state = channel->state();
+    LOG_INFO("%s: fd=%d events=%d state=%d\n", __FUNCTION__, channel->fd(), channel->events(), state);
     if (state == NEW || state == DELETED)
     {
         if (state == NEW)
@@ -63,6 +64,7 @@ void EPollPoller::RemoveChannel(Channel *channel)
 {
     int fd = channel->fd();
     channels_.erase(fd);
+    LOG_INFO("%s: fd=%d remove\n", __FUNCTION__, fd);
     int state = channel->state();
     if (state == ADD)
     {
