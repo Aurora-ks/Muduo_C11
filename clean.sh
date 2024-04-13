@@ -1,9 +1,15 @@
 #! /bin/bash
 
-rm -r /usr/include/network
+if [ -d /usr/include/network ]; then
+    rm -r /usr/include/network
+fi
+
+
 
 cd lib
 for lib in `ls`
 do
-    rm /usr/local/lib/$lib
+    if [ -d lib ]; then
+        rm /usr/local/lib/$lib
+    fi
 done
