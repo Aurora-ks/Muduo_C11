@@ -3,6 +3,7 @@
 #include <functional>
 #include <poll.h>
 #include <memory>
+#include <string>
 #include "../base/nocopyable.h"
 
 class EventLoop;
@@ -46,6 +47,12 @@ public:
     EventLoop *loop() { return loop_; }
 
     void remove();
+
+    // for dubug
+    std::string EventsToString(int fd, int ev) const;
+    std::string EventsToString() const;
+    std::string ReventsToString() const;
+
 private:
     void update();
     void HandleEventWithGuard(Timestamp ReceiveTime);

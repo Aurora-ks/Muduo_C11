@@ -48,6 +48,9 @@ private:
     void SendInLoop(const void *data, size_t len);
     void ShutdownInLoop();
 
+    //for debug
+    const char* StateToString() const;
+
     EventLoop *loop_;
     const std::string name_;
     std::atomic_int state_;

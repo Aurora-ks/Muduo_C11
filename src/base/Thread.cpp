@@ -1,5 +1,6 @@
 #include "Thread.h"
-#include <semaphore.h>
+#include <latch>
+#include <sstream>
 
 std::atomic_int32_t Thread::ThreadCount_(0);
 
@@ -24,15 +25,14 @@ Thread::~Thread()
 void Thread::start()
 {
     started_ = true;
-    sem_t sem;
-    sem_init(&sem, false, 0);
+    std::latch latch(1);
     thread_ = std::shared_ptr<std::thread>(new std::thread([&](){
         ThreadId_ = std::this_thread::get_id();
-        sem_post(&sem);
+        latch.count_down();
         fun_();
     }));
     //确保ThreadId_创建完毕
-    sem_wait(&sem);
+    latch.wait();
 }
 
 void Thread::join()
@@ -50,4 +50,11 @@ void Thread::SetDefaultName()
         snprintf(buf, sizeof(buf), "Thread%d", num);
         name_ = buf;
     }
+}
+
+std::string Thread::CurrentThreadId()
+{
+    std::ostringstream ss;
+    ss << std::this_thread::get_id();
+    return ss.str();
 }

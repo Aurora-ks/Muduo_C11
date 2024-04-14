@@ -1,8 +1,10 @@
 #include "EventLoop.h"
 #include "Logger.h"
-#include "EpollPoller.h"
+#include "Poller.h"
+#include "Thread.h"
+#include <format>
 
-thread_local EventLoop* LoopInThread = nullptr;
+thread_local EventLoop *LoopInThread = nullptr;
 
 // 创建wakeupfd，用来唤醒sub处理新的channel
 static int CreateEventfd()
@@ -10,7 +12,7 @@ static int CreateEventfd()
     int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
     if (evtfd < 0)
     {
-        // LOG_FATAL("eventfd error:%d \n", errno);
+        LOG_FATAL << std::format("create eventfd error:{}", errno);
     }
     return evtfd;
 }
@@ -20,16 +22,19 @@ EventLoop::EventLoop()
       quit_(false),
       callable_(false),
       threadID_(std::this_thread::get_id()),
-      poller_(std::unique_ptr<EPollPoller>(new EPollPoller(this))),
+      poller_(std::unique_ptr<Poller>(new Poller(this))),
       wakeupFd_(CreateEventfd()),
       WakeupChannel_(std::unique_ptr<Channel>(new Channel(this, wakeupFd_))),
       CurrentActiveChannel_(nullptr)
 {
-    // LOG_DEBUG("eventloop %p created in thread %d\n", this, std::this_thread::get_id())
+    auto tid = std::this_thread::get_id();
+
+    LOG_DEBUG << std::format("EventLoop created {} in thread {}",
+                             reinterpret_cast<unsigned long>(this), Thread::CurrentThreadId());
     if (LoopInThread)
     {
-        auto id = std::this_thread::get_id();
-        // LOG_FATAL("other loop %p already exists in thread %lu", LoopInThread, *(unsigned long*)&id)
+        LOG_FATAL << std::format("Another EventLoop {} exists in this thread {}",
+                                 reinterpret_cast<unsigned long>(LoopInThread), Thread::CurrentThreadId());
     }
     else
     {
@@ -41,6 +46,8 @@ EventLoop::EventLoop()
 
 EventLoop::~EventLoop()
 {
+    LOG_DEBUG << std::format("EventLoop {} destructs in thread {}",
+                             reinterpret_cast<unsigned long>(LoopInThread), Thread::CurrentThreadId());
     WakeupChannel_->DisableAll();
     WakeupChannel_->remove();
     ::close(wakeupFd_);
@@ -51,7 +58,7 @@ void EventLoop::start()
 {
     isLooping_ = true;
     quit_ = false;
-    // LOG_INFO("EventLoop %p start\n", this)
+    LOG_DEBUG << std::format("EventLoop {} start", reinterpret_cast<unsigned long>(this));
     while (!quit_)
     {
         ActiveChannels_.clear();
@@ -60,10 +67,9 @@ void EventLoop::start()
         {
             channel->HandleEvent(PollreturnTime_);
         }
-        DoCallback();
+        if(!functors_.empty()) DoCallback();
     }
-    auto id = std::this_thread::get_id();
-    // LOG_INFO("EventLoop %p in thread %lu stoped\n", this, *(unsigned long*)&id)
+    LOG_DEBUG << std::format("EventLoop {} stop", reinterpret_cast<unsigned long>(this));
     isLooping_ = false;
 }
 
@@ -107,7 +113,7 @@ void EventLoop::wakeup()
     ssize_t n = ::write(wakeupFd_, &one, sizeof(one));
     if (n != sizeof(one))
     {
-        // LOG_ERROR("EventLoop::HandleRead() reads %ld bytes instead of 8", n)
+        LOG_ERROR << std::format("EventLoop::wakeup() writes {} bytes instead of 8", n);
     }
 }
 
@@ -130,7 +136,7 @@ void EventLoop::HandleRead()
     ssize_t n = read(wakeupFd_, &one, sizeof(one));
     if (n != sizeof(one))
     {
-        // LOG_ERROR("EventLoop::HandleRead() reads %ld bytes instead of 8", n)
+        LOG_ERROR << std::format("EventLoop::handleRead() reads {} bytes instead of 8", n);
     }
 }
 // 执行回调

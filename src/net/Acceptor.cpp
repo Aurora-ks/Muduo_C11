@@ -1,6 +1,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <errno.h>
+#include <format>
 #include "Acceptor.h"
 #include "Logger.h"
 #include "Address.h"
@@ -10,7 +11,7 @@ static int CreateSocket()
     int sockfd = ::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0);
     if (sockfd < 0)
     {
-        // LOG_FATAL("%s:%s:%d accept socket create error:%d\n", __FILE__, __FUNCTION__, __LINE__, errno)
+        LOG_FATAL << std::format("accept socket create error:{}", errno);
     }
     return sockfd;
 }
@@ -44,8 +45,9 @@ void Acceptor::HandleRead()
 {
     Address peeraddr;
     int connfd = sock_.accept(&peeraddr);
-    if (connfd > 0)
+    if (connfd >= 0)
     {
+        LOG_DEBUG << std::format("accept from {} fd = {}", peeraddr.IpPort(), connfd);
         if (NewConnectionCallback_)
         {
             NewConnectionCallback_(connfd, peeraddr);
@@ -57,6 +59,6 @@ void Acceptor::HandleRead()
     }
     else
     {
-        // LOG_ERROR("%s:%s:%d accept error:%d\n", __FILE__, __FUNCTION__, __LINE__, errno)
+        LOG_ERROR << "in Acceptor::HandleRead";
     }
 }

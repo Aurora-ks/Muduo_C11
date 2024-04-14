@@ -2,6 +2,11 @@
 
 #include <vector>
 #include <unordered_map>
+#include <vector>
+#include <strings.h>
+#include <sys/epoll.h>
+#include <unistd.h>
+#include <error.h>
 #include "Channel.h"
 
 class EventLoop;
@@ -10,14 +15,21 @@ class Timestamp;
 class Poller
 {
 public:
+    enum states
+    {
+        NEW = 0,
+        ADD = 1,
+        DELETED = 2
+    };
     using ChannelList = std::vector<Channel*>;
+    using EventList = std::vector<epoll_event>;
 
     Poller(EventLoop* loop): loop_(loop){}
-    virtual ~Poller() = default;
+    ~Poller() { ::close(epollfd_); }
 
-    virtual Timestamp poll(int timeoutMs, ChannelList* ActivateChannels) = 0;
-    virtual void UpdateChannel(Channel* channel) = 0;
-    virtual void RemoveChannel(Channel* channel) = 0;
+    Timestamp poll(int timeoutMs, ChannelList* ActivateChannels);
+    void UpdateChannel(Channel* channel);
+    void RemoveChannel(Channel* channel);
 
     bool hasChannel(Channel* channel)
     {
@@ -25,11 +37,19 @@ public:
         return it != channels_.end() && it->second == channel;
     }
 
-protected:
-    using ChannelMap = std::unordered_map<int, Channel*>;
+private:
+    void FillActiveChannels(int num, ChannelList *ActiveChannels) const;
+    void update(int operation, Channel *channel);
 
+    //for debug
+    const char* OperationToString(int op) const;
+
+    static const int InitEventListSize = 16;
+
+    using ChannelMap = std::unordered_map<int, Channel*>;
     ChannelMap channels_;
 
-private:
+    int epollfd_;
+    EventList events_;
     EventLoop* loop_;
 };

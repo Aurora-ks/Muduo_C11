@@ -3,6 +3,7 @@
 #include "TcpConnection.h"
 #include <functional>
 #include <strings.h>
+#include <format>
 
 TcpServer::TcpServer(EventLoop *loop, const Address &ListenAddr, const std::string &name, bool ReusePort)
     : loop_(loop),
@@ -16,13 +17,14 @@ TcpServer::TcpServer(EventLoop *loop, const Address &ListenAddr, const std::stri
 {
     if (loop_ == nullptr)
     {
-        // LOG_FATAL("%s:%s:%d mainloop is null\n", __FILE__, __FUNCTION__, __LINE__)
+        LOG_FATAL << std::format("TcpServer::ctor loop is null");
     }
     acceptor_->SetNewConnectionCallback(std::bind(&TcpServer::NewConnection, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 TcpServer::~TcpServer()
 {
+    LOG_DEBUG << std::format("TcpServer::~TcpServer [{}] destructing", name_);
     for (auto &con : connections_)
     {
         TcpConnectionPtr conn(con.second);
@@ -54,8 +56,7 @@ void TcpServer::NewConnection(int sockfd, const Address &PeerAddrest)
     NextConnectionId_++;
     std::string name = name_ + buf;
 
-    // LOG_INFO("%s:%s:%d [%s] - new connection [%s] from %s\n", __FILE__, __FUNCTION__, __LINE__,
-            //  name_.c_str(), name.c_str(), PeerAddrest.IpPort().c_str());
+    LOG_INFO << std::format("new connection [{}] from {}", name, PeerAddrest.IpPort());
 
     sockaddr_in local;
     bzero(&local, sizeof(local));
@@ -83,8 +84,7 @@ void TcpServer::RemoveConnection(const TcpConnectionPtr &connection)
 
 void TcpServer::RemoveConnectionInLoop(const TcpConnectionPtr &connection)
 {
-    // LOG_INFO("%s:%s:%d [%s] - remove connection [%s]\n", __FILE__, __FUNCTION__, __LINE__,
-            //  name_.c_str(), connection->name().c_str());
+    LOG_INFO << std::format("[{}] remove connection [{}]", name_, connection->name());
 
     connections_.erase(connection->name());
     EventLoop *loop = connection->loop();

@@ -24,6 +24,7 @@ public:
     const std::string name() const { return name_; }
 
     static int32_t CreatCount() { return ThreadCount_.load(); }
+    static std::string CurrentThreadId();
 
 private:
     void SetDefaultName();

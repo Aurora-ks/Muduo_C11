@@ -13,7 +13,7 @@
 
 class Channel;
 class Poller;
-class EPollPoller;
+class Poller;
 
 using functor = std::function<void()>;
 using ChannelList = std::vector<Channel* >;
@@ -57,7 +57,7 @@ private:
     std::atomic_bool callable_; // 标识当前loop是否有需要执行的回调
     const std::thread::id threadID_;
     Timestamp PollreturnTime_;
-    std::unique_ptr<EPollPoller> poller_;
+    std::unique_ptr<Poller> poller_;
     int wakeupFd_; // 选择轮询选择一个subloop，通过此成员唤醒
     std::unique_ptr<Channel> WakeupChannel_;
     ChannelList ActiveChannels_;
