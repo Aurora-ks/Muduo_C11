@@ -10,7 +10,7 @@ static int CreateEventfd()
     int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
     if (evtfd < 0)
     {
-        LOG_FATAL("eventfd error:%d \n", errno);
+        // LOG_FATAL("eventfd error:%d \n", errno);
     }
     return evtfd;
 }
@@ -25,11 +25,11 @@ EventLoop::EventLoop()
       WakeupChannel_(std::unique_ptr<Channel>(new Channel(this, wakeupFd_))),
       CurrentActiveChannel_(nullptr)
 {
-    LOG_DEBUG("eventloop %p created in thread %d\n", this, std::this_thread::get_id())
+    // LOG_DEBUG("eventloop %p created in thread %d\n", this, std::this_thread::get_id())
     if (LoopInThread)
     {
         auto id = std::this_thread::get_id();
-        LOG_FATAL("other loop %p already exists in thread %lu", LoopInThread, *(unsigned long*)&id)
+        // LOG_FATAL("other loop %p already exists in thread %lu", LoopInThread, *(unsigned long*)&id)
     }
     else
     {
@@ -51,7 +51,7 @@ void EventLoop::start()
 {
     isLooping_ = true;
     quit_ = false;
-    LOG_INFO("EventLoop %p start\n", this)
+    // LOG_INFO("EventLoop %p start\n", this)
     while (!quit_)
     {
         ActiveChannels_.clear();
@@ -63,7 +63,7 @@ void EventLoop::start()
         DoCallback();
     }
     auto id = std::this_thread::get_id();
-    LOG_INFO("EventLoop %p in thread %lu stoped\n", this, *(unsigned long*)&id)
+    // LOG_INFO("EventLoop %p in thread %lu stoped\n", this, *(unsigned long*)&id)
     isLooping_ = false;
 }
 
@@ -107,7 +107,7 @@ void EventLoop::wakeup()
     ssize_t n = ::write(wakeupFd_, &one, sizeof(one));
     if (n != sizeof(one))
     {
-        LOG_ERROR("EventLoop::HandleRead() reads %ld bytes instead of 8", n)
+        // LOG_ERROR("EventLoop::HandleRead() reads %ld bytes instead of 8", n)
     }
 }
 
@@ -130,7 +130,7 @@ void EventLoop::HandleRead()
     ssize_t n = read(wakeupFd_, &one, sizeof(one));
     if (n != sizeof(one))
     {
-        LOG_ERROR("EventLoop::HandleRead() reads %ld bytes instead of 8", n)
+        // LOG_ERROR("EventLoop::HandleRead() reads %ld bytes instead of 8", n)
     }
 }
 // 执行回调

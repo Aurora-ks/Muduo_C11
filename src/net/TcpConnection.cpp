@@ -23,7 +23,7 @@ TcpConnection::TcpConnection(EventLoop *loop, const std::string name, int sockfd
 {
     if(loop_ == nullptr)
     {
-        LOG_FATAL("%s:%s:%d connectionloop is null\n", __FILE__, __FUNCTION__, __LINE__)
+        // LOG_FATAL("%s:%s:%d connectionloop is null\n", __FILE__, __FUNCTION__, __LINE__)
     }
     channel_->SetReadCallback(std::bind(&TcpConnection::HeadleRead, this, std::placeholders::_1));
     channel_->SetWriteCallback(std::bind(&TcpConnection::HandleWrite, this));
@@ -34,7 +34,7 @@ TcpConnection::TcpConnection(EventLoop *loop, const std::string name, int sockfd
 
 TcpConnection::~TcpConnection()
 {
-    LOG_DEBUG("TcpConnection::destruct[%s]-fd=%d-state=%d\n", name_.c_str(), channel_->fd(), state_.load())
+    // LOG_DEBUG("TcpConnection::destruct[%s]-fd=%d-state=%d\n", name_.c_str(), channel_->fd(), state_.load())
 }
 
 void TcpConnection::send(const std::string &data)
@@ -60,7 +60,7 @@ void TcpConnection::SendInLoop(const void *data, size_t len)
     //调用过shutdown，不能发送
     if(state_ == kDisconnected)
     {
-        LOG_ERROR("%d is disconnected, can not send\n", socket_->fd())
+        // LOG_ERROR("%d is disconnected, can not send\n", socket_->fd())
     }
     //channel第一次发数据，并且缓冲区没有可发送的数据
     if(!channel_->isWriting() && OutputBuffer_.ReadableBytes() == 0)
@@ -79,7 +79,7 @@ void TcpConnection::SendInLoop(const void *data, size_t len)
             nwrite = 0;
             if(errno != EAGAIN)
             {
-                LOG_ERROR("TcpConnection::SendInLoop")
+                // LOG_ERROR("TcpConnection::SendInLoop")
                 if(errno == EPIPE || errno == ECONNRESET)
                 {
                     err = true;
@@ -161,7 +161,7 @@ void TcpConnection::HeadleRead(Timestamp ReceiveTime)
     else
     {
         err = errno;
-        LOG_ERROR("TcpConnection::HeadleRead")
+        // LOG_ERROR("TcpConnection::HeadleRead")
         HandleError();
     }
 }
@@ -190,18 +190,18 @@ void TcpConnection::HandleWrite()
         }
         else
         {
-            LOG_ERROR("TcpConnection::HandleWrite")
+            // LOG_ERROR("TcpConnection::HandleWrite")
         }
     }
     else
     {
-        LOG_ERROR("TcpConnection fd = %d is down, no more writing\n", socket_->fd())
+        // LOG_ERROR("TcpConnection fd = %d is down, no more writing\n", socket_->fd())
     }
 }
 
 void TcpConnection::HandleClose()
 {
-    LOG_INFO("TcpConnection::HandleClose fd=%d close, state=%d\n", socket_->fd(), state_.load())
+    // LOG_INFO("TcpConnection::HandleClose fd=%d close, state=%d\n", socket_->fd(), state_.load())
     state_ = kDisconnected;
     channel_->DisableAll();
     TcpConnectionPtr self = shared_from_this();
@@ -228,5 +228,5 @@ void TcpConnection::HandleError()
     {
         err = opt;
     }
-    LOG_ERROR("TcpConnection::HandleError name:%s SO_ERROR:%d\n", name_.c_str(), err)
+    // LOG_ERROR("TcpConnection::HandleError name:%s SO_ERROR:%d\n", name_.c_str(), err)
 }

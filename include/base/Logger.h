@@ -25,10 +25,8 @@ public:
 
     LogStream& stream() { return stream_; }
 
-    static inline LogLevel loglevel();
+    static LogLevel loglevel();
     static void SetLogLevel(LogLevel level);
-    // void log(std::string msg);
-    // void log(int level, std::string msg);
 
     using OutputFun = void(*) (const char* msg, int len);
     using FlushFun = void(*) ();
@@ -45,6 +43,11 @@ private:
 
 extern Logger::LogLevel g_LogLevel;
 
+inline Logger::LogLevel Logger::loglevel()
+{
+    return g_LogLevel;
+}
+
 #define LOG_INFO \
     if(Logger::loglevel() <= Logger::LogLevel::INFO) \
     Logger(__FILE__, __LINE__, Logger::LogLevel::INFO).stream()
@@ -54,37 +57,5 @@ extern Logger::LogLevel g_LogLevel;
     Logger(__FILE__, __LINE__, Logger::LogLevel::DEBUG).stream()
 
 #define LOG_WARN Logger(__FILE__, __LINE__, Logger::LogLevel::WARN).stream()
-#define LOG_WARN Logger(__FILE__, __LINE__, Logger::LogLevel::ERROR).stream()
-#define LOG_WARN Logger(__FILE__, __LINE__, Logger::LogLevel::FATAL).stream()
-/* #define LOG_INFO(MsgFormat, ...) \
-    do{ \
-        char buf[1024]{0}; \
-        snprintf(buf, 1024, MsgFormat, ##__VA_ARGS__); \
-        Logger::GetInstance()->log(INFO, buf); \
-    }while(0);
-
-#define LOG_ERROR(MsgFormat, ...) \
-    do{ \
-        char buf[1024]{0}; \
-        snprintf(buf, 1024, MsgFormat, ##__VA_ARGS__); \
-        Logger::GetInstance()->log(ERROR, buf); \
-    }while(0);
-
-#define LOG_FATAL(MsgFormat, ...) \
-    do{ \
-        char buf[1024]{0}; \
-        snprintf(buf, 1024, MsgFormat, ##__VA_ARGS__); \
-        Logger::GetInstance()->log(FATAL, buf); \
-        exit(-1); \
-    }while(0);
-
-#ifdef DEBUG_MOD
-#define LOG_DEBUG(MsgFormat, ...) \
-    do{ \
-        char buf[1024]{0}; \
-        snprintf(buf, 1024, MsgFormat, ##__VA_ARGS__); \
-        Logger::GetInstance()->log(DEBUG, buf); \
-    }while(0);
-#else
-    #define LOG_DEBUG(MsgFormat, ...)
-#endif */
+#define LOG_ERROR Logger(__FILE__, __LINE__, Logger::LogLevel::ERROR).stream()
+#define LOG_FATAL Logger(__FILE__, __LINE__, Logger::LogLevel::FATAL).stream()

@@ -5,8 +5,8 @@
 #include <string.h>
 #include <string>
 
-const int kSmallBuffer = 4096;        // 4K
-const int kLargeBuffer = 4096 * 1024; // 4M
+const int kSmallBuffer = 4096;        // 4K for LogStream
+const int kLargeBuffer = 4096 * 1024; // 4M for AsyncLogger
 
 template <int SIZE>
 class FixedBuffer : nocopyable
@@ -18,7 +18,7 @@ public:
     {
         if(FreeSize() > len)
         {
-            memccpy(cur_, msg, len);
+            memcpy(cur_, msg, len);
             cur_ += len;
         }
     }

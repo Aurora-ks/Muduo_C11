@@ -7,13 +7,26 @@ Logger::LogLevel g_LogLevel = Logger::LogLevel::INFO;
 #endif
 
 const char *LogLevelName[Logger::LogLevel::LOG_NUM] =
-    {
+{
         "DEBUG ",
         "INFO  ",
         "WARN  ",
         "ERROR ",
         "FATAL ",
 };
+
+void DefaultOutput(const char *msg, int len)
+{
+    fwrite(msg, len, 1, stdout);
+}
+
+void DefaultFlush()
+{
+    fflush(stdout);
+}
+
+Logger::OutputFun g_output = DefaultOutput;
+Logger::FlushFun g_flush = DefaultFlush;
 
 /* class T
 {
@@ -35,7 +48,7 @@ Logger::Logger(std::string file, int line)
       line_(line),
       basename_(file)
 {
-    stream_ << Timestamp::now().toString() << LogLevelName[level_];
+    stream_ << Timestamp::now().toString() << ' ' << LogLevelName[level_];
 }
 
 Logger::Logger(std::string file, int line, LogLevel level)
@@ -43,7 +56,7 @@ Logger::Logger(std::string file, int line, LogLevel level)
       line_(line),
       basename_(file)
 {
-    stream_ << Timestamp::now().toString() << LogLevelName[level_];
+    stream_ << Timestamp::now().toString() << ' ' << LogLevelName[level_];
 }
 
 Logger::~Logger()
@@ -58,27 +71,9 @@ Logger::~Logger()
     }
 }
 
-Logger::OutputFun g_output = DefaultOutput;
-Logger::FlushFun g_flush = DefaultFlush;
-
 void Logger::SetLogLevel(Logger::LogLevel level)
 {
     g_LogLevel = level;
-}
-
-Logger::LogLevel Logger::loglevel()
-{
-    return g_LogLevel;
-}
-
-void DefaultOutput(const char *msg, int len)
-{
-    fwrite(msg, len, 1, stdout);
-}
-
-void DefaultFlush()
-{
-    fflush(stdout);
 }
 
 void Logger::SetOutput(OutputFun f)
@@ -89,29 +84,3 @@ void Logger::SetFlush(FlushFun f)
 {
     g_flush = f;
 }
-
-/* void Logger::log(std::string msg)
-{
-    switch (LogLevel_)
-    {
-    case INFO:
-        std::cout << "[info] ";
-        break;
-    case ERROR:
-        std::cout << "[error] ";
-        break;
-    case FATAL:
-        std::cout << "[fatal] ";
-        break;
-    case DEBUG:
-        std::cout << "[debug] ";
-    }
-    std::cout << Timestamp::now().toString() << ": ";
-    std::cout << msg << std::endl;
-}
-
-void Logger::log(int level, std::string msg)
-{
-    SetLevel(level);
-    log(msg);
-} */

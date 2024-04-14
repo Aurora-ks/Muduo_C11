@@ -15,7 +15,7 @@ void Socket::BindAddress(const Address &localaddr)
 {
     if (0 != ::bind(sockfd_, (sockaddr *)localaddr.sockaddr(), sizeof(struct sockaddr_in)))
     {
-        LOG_FATAL("sockfd:%d bind failed\n", sockfd_)
+        // LOG_FATAL("sockfd:%d bind failed\n", sockfd_)
     }
 }
 
@@ -23,7 +23,7 @@ void Socket::listen()
 {
     if (0 != ::listen(sockfd_, 1024))
     {
-        LOG_FATAL("sockfd:%d listen failed\n", sockfd_)
+        // LOG_FATAL("sockfd:%d listen failed\n", sockfd_)
     }
 }
 
@@ -44,7 +44,7 @@ void Socket::ShutdownWrite()
 {
     if (::shutdown(sockfd_, SHUT_WR) < 0)
     {
-        LOG_ERROR("sockfd:%d ShutdownWrite error\n", sockfd_)
+        // LOG_ERROR("sockfd:%d ShutdownWrite error\n", sockfd_)
     }
 }
 

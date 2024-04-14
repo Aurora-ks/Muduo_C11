@@ -8,7 +8,7 @@ EPollPoller::EPollPoller(EventLoop *loop)
 {
     if (epollfd_ < 0)
     {
-        LOG_FATAL("epoll_creat error:%d\n", errno)
+        // LOG_FATAL("epoll_creat error:%d\n", errno)
     }
 }
 
@@ -26,7 +26,7 @@ Timestamp EPollPoller::poll(int timeoutMs, ChannelList *ActivateChannels)
     }
     else if (num == 0)
     {
-        LOG_DEBUG("%s timeout\n", __FUNCTION__)
+        // LOG_DEBUG("%s timeout\n", __FUNCTION__)
     }
     return Timestamp::now();
 }
@@ -34,7 +34,7 @@ Timestamp EPollPoller::poll(int timeoutMs, ChannelList *ActivateChannels)
 void EPollPoller::UpdateChannel(Channel *channel)
 {
     const int state = channel->state();
-    LOG_INFO("%s: fd=%d events=%d state=%d\n", __FUNCTION__, channel->fd(), channel->events(), state);
+    // LOG_INFO("%s: fd=%d events=%d state=%d\n", __FUNCTION__, channel->fd(), channel->events(), state);
     if (state == NEW || state == DELETED)
     {
         if (state == NEW)
@@ -64,7 +64,7 @@ void EPollPoller::RemoveChannel(Channel *channel)
 {
     int fd = channel->fd();
     channels_.erase(fd);
-    LOG_INFO("%s: fd=%d remove\n", __FUNCTION__, fd);
+    // LOG_INFO("%s: fd=%d remove\n", __FUNCTION__, fd);
     int state = channel->state();
     if (state == ADD)
     {
@@ -98,11 +98,11 @@ void EPollPoller::update(int operation, Channel *channel)
     {
         if (operation == EPOLL_CTL_DEL)
         {
-            LOG_ERROR("epoll_ctl_del error:%d\n", errno)
+            // LOG_ERROR("epoll_ctl_del error:%d\n", errno)
         }
         else
         {
-            LOG_FATAL("epoll_ctl_add/mod error:%d\n", errno)
+            // LOG_FATAL("epoll_ctl_add/mod error:%d\n", errno)
         }
     }
 }
