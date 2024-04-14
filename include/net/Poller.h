@@ -24,7 +24,7 @@ public:
     using ChannelList = std::vector<Channel*>;
     using EventList = std::vector<epoll_event>;
 
-    Poller(EventLoop* loop): loop_(loop){}
+    Poller(EventLoop* loop);
     ~Poller() { ::close(epollfd_); }
 
     Timestamp poll(int timeoutMs, ChannelList* ActivateChannels);

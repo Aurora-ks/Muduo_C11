@@ -27,7 +27,7 @@ Timestamp Poller::poll(int timeoutMs, ChannelList *ActivateChannels)
     }
     else if (num == 0)
     {
-        LOG_DEBUG << "nothing happened\n";
+        LOG_DEBUG << "nothing happened";
     }
     return Timestamp::now();
 }
