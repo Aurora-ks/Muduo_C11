@@ -1,7 +1,9 @@
+#pragma once
+
 #include <fstream>
 #include <string>
 #include <mutex>
-#include "nocopyable.h"
+#include "base/nocopyable.h"
 
 class LogFile : nocopyable
 {

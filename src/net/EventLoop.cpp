@@ -1,7 +1,7 @@
-#include "EventLoop.h"
-#include "Logger.h"
-#include "Poller.h"
-#include "Thread.h"
+#include "net/EventLoop.h"
+#include "net/Poller.h"
+#include "base/Logger.h"
+#include "base/Thread.h"
 #include <format>
 
 thread_local EventLoop *LoopInThread = nullptr;
@@ -63,6 +63,7 @@ void EventLoop::start()
     {
         ActiveChannels_.clear();
         PollreturnTime_ = poller_->poll(PollTimeMs, &ActiveChannels_);
+
         for (auto channel : ActiveChannels_)
         {
             channel->HandleEvent(PollreturnTime_);

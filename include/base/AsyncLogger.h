@@ -1,6 +1,8 @@
-#include "nocopyable.h"
-#include "LogStream.h"
-#include "Thread.h"
+#pragma once
+
+#include "base/nocopyable.h"
+#include "base/LogStream.h"
+#include "base/Thread.h"
 #include <vector>
 #include <memory>
 #include <mutex>

@@ -32,6 +32,7 @@ public:
     const char* peek() const { return begin() + ReaderIndex_; }
 
     void retrieve(size_t len);
+    void RetrieveUntil(const char *end);
     void RetrieveAll();
     std::string RetrieveToString(size_t len);
     std::string RetrieveAllToString();
@@ -39,8 +40,11 @@ public:
 
     //写入数据
     void append(const char* data, size_t len);
+    void append(const std::string &data);
     ssize_t ReadFromFd(int fd, int* err);
     ssize_t WriteFromFd(int fd, int* err);
+
+    const char* findCRLF() const;
 private:
     char* begin() { return &*buffer_.begin(); }
     const char* begin() const { return &*buffer_.begin(); }
@@ -53,4 +57,6 @@ private:
     std::vector<char> buffer_;
     size_t ReaderIndex_;
     size_t WriterIndex_;
+
+    static const char kCRLF[];
 };

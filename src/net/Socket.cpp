@@ -3,9 +3,9 @@
 #include <strings.h>
 #include <netinet/tcp.h>
 #include <format>
-#include "Socket.h"
-#include "Address.h"
-#include "Logger.h"
+#include "net/Socket.h"
+#include "net/Address.h"
+#include "base/Logger.h"
 
 Socket::~Socket()
 {

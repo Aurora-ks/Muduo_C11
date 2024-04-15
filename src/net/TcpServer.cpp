@@ -1,6 +1,6 @@
-#include "TcpServer.h"
-#include "Logger.h"
-#include "TcpConnection.h"
+#include "net/TcpServer.h"
+#include "base/Logger.h"
+#include "net/TcpConnection.h"
 #include <functional>
 #include <strings.h>
 #include <format>
@@ -40,6 +40,7 @@ void TcpServer::SetThreadNum(int num)
 
 void TcpServer::start()
 {
+    LOG_INFO << std::format("TcpServer running on {}", IpPort_);
     if(started_++ == 0)
     {
         ThreadPool_->start(ThreadInitCallback_);
@@ -63,7 +64,7 @@ void TcpServer::NewConnection(int sockfd, const Address &PeerAddrest)
     socklen_t len = sizeof(local);
     if (::getsockname(acceptor_->socket().fd(), (sockaddr *)&local, &len) < 0)
     {
-        // LOG_ERROR("TcpServer::NewConnection::getsockname")
+        LOG_ERROR << "TcpServer::NewConnection::getsockname";
     }
     Address LocalAddress(local);
     TcpConnectionPtr connection(new TcpConnection(ioloop, name, sockfd, LocalAddress, PeerAddrest));

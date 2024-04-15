@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../base/nocopyable.h"
-#include "../base/Timestamp.h"
-#include "Address.h"
-#include "Callbacks.h"
-#include "Buffer.h"
+#include "base/nocopyable.h"
+#include "base/Timestamp.h"
+#include "net/Address.h"
+#include "net/Callbacks.h"
+#include "net/Buffer.h"
 #include <memory>
 #include <string>
 #include <atomic>
@@ -29,6 +29,7 @@ public:
     bool disconnected() const { return state_ == kDisconnected; }
 
     void send(const std::string &data);
+    void send(Buffer *buf);
     void shutdown();
 
     void SetConnectionCallback(const ConnectionCallback &callback) { ConnectionCallback_ = std::move(callback); }

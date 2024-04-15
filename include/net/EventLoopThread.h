@@ -4,8 +4,8 @@
 #include <string>
 #include <mutex>
 #include <condition_variable>
-#include "../base/nocopyable.h"
-#include "../base/Thread.h"
+#include "base/nocopyable.h"
+#include "base/Thread.h"
 
 class EventLoop;
 

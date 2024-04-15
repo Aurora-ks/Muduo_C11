@@ -4,15 +4,15 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
-#include "../base/nocopyable.h"
-#include "EventLoop.h"
-#include "EventLoopThread.h"
-#include "EventLoopThreadPool.h"
-#include "Acceptor.h"
-#include "Address.h"
-#include "Callbacks.h"
-#include "TcpConnection.h"
-#include "Buffer.h"
+#include "base/nocopyable.h"
+#include "net/EventLoop.h"
+#include "net/EventLoopThread.h"
+#include "net/EventLoopThreadPool.h"
+#include "net/Acceptor.h"
+#include "net/Address.h"
+#include "net/Callbacks.h"
+#include "net/TcpConnection.h"
+#include "net/Buffer.h"
 
 class TcpServer : nocopyable
 {
@@ -30,6 +30,8 @@ public:
     void SetThreadNum(int num);
     void start();
 
+    std::string IpPort() const { return IpPort_; }
+    std::string name() const { return name_; }
 private:
     using ConnectionMap = std::unordered_map<std::string, TcpConnectionPtr>;
 

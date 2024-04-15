@@ -1,8 +1,8 @@
-#include "TcpConnection.h"
-#include "Socket.h"
-#include "Channel.h"
-#include "Logger.h"
-#include "EventLoop.h"
+#include "net/TcpConnection.h"
+#include "net/Socket.h"
+#include "net/Channel.h"
+#include "net/EventLoop.h"
+#include "base/Logger.h"
 #include <functional>
 #include <errno.h>
 #include <sys/socket.h>
@@ -28,8 +28,6 @@ TcpConnection::TcpConnection(EventLoop *loop, const std::string name, int sockfd
     }
     channel_->SetReadCallback(std::bind(&TcpConnection::HeadleRead, this, std::placeholders::_1));
     channel_->SetWriteCallback(std::bind(&TcpConnection::HandleWrite, this));
-    channel_->SetCloseCallback(std::bind(&TcpConnection::HandleClose, this));
-    channel_->SetErrorCallback(std::bind(&TcpConnection::HandleError, this));
     socket_->SetKeepAlive(true);
     LOG_DEBUG << std::format("TcpConnection::ctor[{}] at {} fd = {}",
                              name_, reinterpret_cast<unsigned long>(this), socket_->fd());
@@ -52,6 +50,22 @@ void TcpConnection::send(const std::string &data)
         else
         {
             loop_->RunInLoop(std::bind(&TcpConnection::SendInLoop, this, data.c_str(), data.size()));
+        }
+    }
+}
+
+void TcpConnection::send(Buffer *buf)
+{
+    if(state_ == kConnected)
+    {
+        if(loop_->IsInLoopThread())
+        {
+            SendInLoop(buf->peek(), buf->ReadableBytes());
+            buf->RetrieveAll();
+        }
+        else
+        {
+            loop_->RunInLoop(std::bind(&TcpConnection::SendInLoop, this, buf->peek(), buf->ReadableBytes()));
         }
     }
 }

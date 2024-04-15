@@ -7,7 +7,7 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 #include <error.h>
-#include "Channel.h"
+#include "net/Channel.h"
 
 class EventLoop;
 class Timestamp;

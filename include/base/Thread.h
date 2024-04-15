@@ -5,7 +5,7 @@
 #include <thread>
 #include <memory>
 #include <atomic>
-#include "nocopyable.h"
+#include "base/nocopyable.h"
 
 
 class Thread : nocopyable

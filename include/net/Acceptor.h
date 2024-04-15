@@ -1,9 +1,9 @@
 #pragma once
 
 #include <functional>
-#include "../base/nocopyable.h"
-#include "Socket.h"
-#include "Channel.h"
+#include "base/nocopyable.h"
+#include "net/Socket.h"
+#include "net/Channel.h"
 
 class EventLoop;
 class Address;

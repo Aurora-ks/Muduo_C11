@@ -8,8 +8,8 @@
 #include <mutex>
 #include <sys/eventfd.h>
 #include <errno.h>
-#include "../base/nocopyable.h"
-#include "../base/Timestamp.h"
+#include "base/nocopyable.h"
+#include "base/Timestamp.h"
 
 class Channel;
 class Poller;

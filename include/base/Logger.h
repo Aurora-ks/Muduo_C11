@@ -1,7 +1,7 @@
 #pragma once
 
-#include "LogStream.h"
-#include "Timestamp.h"
+#include "base/LogStream.h"
+#include "base/Timestamp.h"
 
 #define LOG_DEBUG_ON 1
 class T;

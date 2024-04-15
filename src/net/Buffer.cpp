@@ -1,7 +1,9 @@
-#include "Buffer.h"
+#include "net/Buffer.h"
 #include <errno.h>
 #include <sys/uio.h>
 #include <unistd.h>
+
+const char Buffer::kCRLF[] = "\r\n";
 
 void Buffer::retrieve(size_t len)
 {
@@ -13,6 +15,10 @@ void Buffer::retrieve(size_t len)
     {
         RetrieveAll();
     }
+}
+void Buffer::RetrieveUntil(const char *end)
+{
+    retrieve(end - peek());
 }
 
 void Buffer::RetrieveAll()
@@ -48,6 +54,11 @@ void Buffer::append(const char *data, size_t len)
     WriterIndex_ += len;
 }
 
+void Buffer::append(const std::string &data)
+{
+    append(data.c_str(), data.size());
+}
+
 ssize_t Buffer::ReadFromFd(int fd, int *err)
 {
     char extrabuf[65536]{0}; // 64K
@@ -59,11 +70,11 @@ ssize_t Buffer::ReadFromFd(int fd, int *err)
     vec[1].iov_len = sizeof(extrabuf);
     const int iovcnt = (writeable < sizeof(extrabuf) ? 2 : 1);
     const ssize_t n = ::readv(fd, vec, iovcnt);
-    if(n < 0)
+    if (n < 0)
     {
         *err = errno;
     }
-    else if(n <= writeable)
+    else if (n <= writeable)
     {
         WriterIndex_ += n;
     }
@@ -75,10 +86,10 @@ ssize_t Buffer::ReadFromFd(int fd, int *err)
     return n;
 }
 
-ssize_t Buffer::WriteFromFd(int fd, int* err)
+ssize_t Buffer::WriteFromFd(int fd, int *err)
 {
     ssize_t n = ::write(fd, peek(), ReadableBytes());
-    if(n < 0)
+    if (n < 0)
     {
         *err = errno;
     }
@@ -98,4 +109,10 @@ void Buffer::MakeSpace(size_t len)
         ReaderIndex_ = kCheapPrepend;
         WriterIndex_ = ReaderIndex_ + DataLen;
     }
+}
+
+const char *Buffer::findCRLF() const
+{
+    const char *crlf = std::search(peek(), BeginWrite(), kCRLF, kCRLF + 2);
+    return crlf == BeginWrite() ? NULL : crlf;
 }

@@ -2,7 +2,7 @@
 
 #include <mutex>
 #include <memory>
-#include "nocopyable.h"
+#include "base/nocopyable.h"
 
 template<class T>
 class Singleton : nocopyable

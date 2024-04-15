@@ -11,18 +11,8 @@ cmake -B build &&
 
 rm -r build
 
-if [ ! -d /usr/include/network ]; then
-    mkdir /usr/include/network
-fi
-
-cd include
-for header in `ls`
-do
-    cp -r $header /usr/include/network
-done
-
-cd ../lib
+cd lib
 for lib in `ls`
 do
-    cp $lib /usr/local/lib
+    cp $lib /usr/lib
 done

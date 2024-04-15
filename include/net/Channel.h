@@ -4,7 +4,7 @@
 #include <poll.h>
 #include <memory>
 #include <string>
-#include "../base/nocopyable.h"
+#include "base/nocopyable.h"
 
 class EventLoop;
 class Timestamp;
