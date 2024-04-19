@@ -10,13 +10,16 @@
 #include <errno.h>
 #include "base/nocopyable.h"
 #include "base/Timestamp.h"
+#include "net/Callbacks.h"
 
 class Channel;
 class Poller;
 class Poller;
+class TimerQueue;
 
 using functor = std::function<void()>;
 using ChannelList = std::vector<Channel* >;
+using TimerID = uint64_t;
 
 const int PollTimeMs = 10000;
 
@@ -46,6 +49,13 @@ public:
 
     bool IsInLoopThread() const { return threadID_ == std::this_thread::get_id(); }
 
+    TimerID RunAt(Timestamp time, TimerCallback f);
+    TimerID RunAfterS(int delay, TimerCallback f);
+    TimerID RunAfterMs(int delay, TimerCallback f);
+    TimerID RunEveryS(int delay, TimerCallback f);
+    TimerID RunEveryMs(int delay, TimerCallback f);
+    void CancelTimer(TimerID timerid);
+
 private:
     // 唤醒
     void HandleRead();
@@ -58,6 +68,7 @@ private:
     const std::thread::id threadID_;
     Timestamp PollreturnTime_;
     std::unique_ptr<Poller> poller_;
+    std::unique_ptr<TimerQueue> TimerQueue_;
     int wakeupFd_; // 选择轮询选择一个subloop，通过此成员唤醒
     std::unique_ptr<Channel> WakeupChannel_;
     ChannelList ActiveChannels_;

@@ -1,5 +1,6 @@
 #include "net/EventLoop.h"
 #include "net/Poller.h"
+#include "net/TimerQueue.h"
 #include "base/Logger.h"
 #include "base/Thread.h"
 #include <format>
@@ -23,6 +24,7 @@ EventLoop::EventLoop()
       callable_(false),
       threadID_(std::this_thread::get_id()),
       poller_(std::unique_ptr<Poller>(new Poller(this))),
+      TimerQueue_(new TimerQueue(this)),
       wakeupFd_(CreateEventfd()),
       WakeupChannel_(std::unique_ptr<Channel>(new Channel(this, wakeupFd_))),
       CurrentActiveChannel_(nullptr)
@@ -129,6 +131,40 @@ void EventLoop::RemoveChannel(Channel *channel)
 bool EventLoop::HasChannel(Channel *channel)
 {
     return poller_->hasChannel(channel);
+}
+
+TimerID EventLoop::RunAt(Timestamp time, TimerCallback f)
+{
+    return TimerQueue_->AddTimer(std::move(f), time, 0);
+}
+
+TimerID EventLoop::RunAfterS(int delay, TimerCallback f)
+{
+    Timestamp time = Timestamp::now() + delay * 1000;
+    return RunAt(time, std::move(f));
+}
+
+TimerID EventLoop::RunAfterMs(int delay, TimerCallback f)
+{
+    Timestamp time = Timestamp::now() + delay;
+    return RunAt(time, std::move(f));
+}
+
+TimerID EventLoop::RunEveryS(int delay, TimerCallback f)
+{
+    Timestamp time = Timestamp::now() + delay * 1000;
+    return TimerQueue_->AddTimer(std::move(f), time, delay*1000);
+}
+
+TimerID EventLoop::RunEveryMs(int delay, TimerCallback f)
+{
+    Timestamp time = Timestamp::now() + delay * 1000;
+    return TimerQueue_->AddTimer(std::move(f), time, delay);
+}
+
+void EventLoop::CancelTimer(TimerID timerid)
+{
+    TimerQueue_->cancel(timerid);
 }
 
 void EventLoop::HandleRead()
