@@ -21,7 +21,7 @@ using functor = std::function<void()>;
 using ChannelList = std::vector<Channel* >;
 using TimerID = uint64_t;
 
-const int PollTimeMs = 10000;
+const int PollTimeMs = 5000;
 
 class EventLoop : nocopyable
 {
